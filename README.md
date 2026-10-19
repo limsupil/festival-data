@@ -1,6 +1,6 @@
 # festival-data
 
-토스 미니앱 "축제 알리미"가 읽는 전국 축제 데이터.
+토스 미니앱 "페스티발고"가 읽는 전국 축제 데이터.
 
 - 주소: https://limsupil.github.io/festival-data/festivals.json
 - 갱신: 매일 03:00(한국 시간) GitHub Actions가 `fetch-festivals.mjs`를 실행해 GitHub Pages로 배포한다.
