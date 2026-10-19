@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # 아래 매달 빈 커밋용
   pages: write
   id-token: write
 
@@ -24,6 +24,15 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # GitHub는 공개 저장소에 60일 동안 커밋이 없으면 예약 실행을 멈춘다. 매달 1일 빈 커밋으로 살려 둔다
+      - name: keep schedule alive
+        if: github.event_name == 'schedule'
+        run: |
+          [ "$(date -u +%d)" = "01" ] || exit 0
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit --allow-empty -m 'keepalive: monthly commit so the daily schedule keeps running'
+          git push
       - uses: actions/setup-node@v4
         with:
           node-version: 24
