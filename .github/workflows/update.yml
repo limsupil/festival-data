@@ -1,0 +1,38 @@
+# 매일 새벽 3시(한국 시간)에 축제 데이터를 받아 GitHub Pages로 공개한다.
+# 실패하면 배포하지 않아 어제 파일이 그대로 남는다. 손으로 돌리려면 Actions 탭에서 Run workflow.
+name: update festivals
+
+on:
+  schedule:
+    - cron: '0 18 * * *' # UTC 18:00 = 한국 03:00
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node fetch-festivals.mjs
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
